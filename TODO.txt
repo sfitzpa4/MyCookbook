@@ -1,0 +1,3 @@
+- Get the recipe info from the form to post to console
+- Update /add to be stylized
+- Put project on Git
