@@ -8,14 +8,10 @@ const app = express();
 app.set('view engine', 'pug');
 
 // Parse URL-encoded bodies (as sent by HTML forms)
-app.use(express.urlencoded());
+app.use(bodyParser.urlencoded({extended: false}));
 
 // Parse JSON bodies (as sent by API clients)
-app.use(express.json());
-
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser.json());
 
 
 app.use(express.static(__dirname + '/public'));
@@ -36,32 +32,40 @@ app.get('/profile', (req, res) => {
 });
 
 app.get('/add', (req, res) => {
+  console.log('ADD PAGE');
   res.render('add', {
     title: 'Add Recipe',
     people: people.profiles
   })
 });
 
-fetch('/create', {
-  method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        recipe: {
-            name: "John",
-            author: "john@example.com"
-        }
-    })
-});
+// fetch('/create', {
+//   method: 'POST',
+//     headers: {
+//         'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//         recipe: {
+//             name: "1",
+//             author: "2"
+//         }
+//     })
+// });
 
-app.post('/create', function(request, response){
-  console.log(request.body.recipe.name);
-  console.log(request.body.recipe.author);
-});
+// app.post('/create', function(request, response){
+//   console.log('POST GOT 1');
+//   console.log(request.body.name);
+//   console.log(request.body.author);
+// });
 
-app.post("/", function (req, res) {
-  console.log(request.body.recipe.name)
+app.post("/add", function (req, res) {
+  console.log('POST GOT 2');
+  console.log(req.body.name);
+  console.log(req.body.author);
+  res.render('add', {
+    title: 'Add Recipe',
+    people: people.profiles
+  })
 });
 
 const server = app.listen(7000, () => {
