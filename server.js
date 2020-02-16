@@ -41,26 +41,17 @@ app.get('/add', (req, res) => {
   })
 });
 
+app.get('/login', (req,res) => {
+  res.render('login', {
+    title: 'Log In'
+  })
+});
 
-// app.post('/create', (req, res) => {
-//   console.log('Create');
-//   res.render('index', {
-//     title: 'Homepage',
-//       people: people.profiles
-//   })
-// });
-// fetch('/create', {
-//   method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({
-//         recipe: {
-//             name: "1",
-//             author: "2"
-//         }
-//     })
-// });
+app.post('/login', (req,res) => {
+  console.log('Login Post');
+  console.log(req.body.username);
+  console.log(req.body.password);
+});
 
 app.post("/create", function (req, res) {
   console.log('POST GOT 2');
