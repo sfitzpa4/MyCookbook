@@ -1,19 +1,26 @@
 extends default
 
 block content
-  .main.container
-    .row
-        .col-md-6.col-md-offset-3
+    div.recipe
+        div.recipe-images
+        div.recipe-image(style=`background: url('/images/burger.jpeg')
+        no-repeat;`)
+        div.recipe-image(style=`background: url('/images/pancakes.jpeg')
+        no-repeat;`)
+        div.col-md-12.col-md-offset-3
             h1.display-4.m-b-2 Enter Recipe
             body
-                form(method='POST' name='create')
-                    div.form-group
+                form(action='/create' method='POST')
+                    div.recipe-form
                         label(for='name') Name:
                         input#name.form-control(type='text', placeholder='Name of Recipe', name='name')
-                    div.form-group
+                    div.recipe-form
                         label(for='author') Author:
                         input#name.form-control(type='text', placeholder='Name of Author', name='author')
-                    div.submit-button
-                        label(for='submit') Add:
+                    div.recipe-text-area
+                        label(for='ingredients') Ingredient List:
+                        textarea(type='text', placeholder='List of Ingredients Here', name='ingredients')
+                    div.recipe-form.button
                         input(type='submit', name='submit')
+
 

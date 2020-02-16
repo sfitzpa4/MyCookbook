@@ -4,6 +4,8 @@ const fetch = require("node-fetch");
 const bodyParser = require("body-parser");
 
 const app = express();
+var fs = require('fs')
+var url = require('url');
 
 app.set('view engine', 'pug');
 
@@ -39,6 +41,14 @@ app.get('/add', (req, res) => {
   })
 });
 
+
+// app.post('/create', (req, res) => {
+//   console.log('Create');
+//   res.render('index', {
+//     title: 'Homepage',
+//       people: people.profiles
+//   })
+// });
 // fetch('/create', {
 //   method: 'POST',
 //     headers: {
@@ -52,16 +62,22 @@ app.get('/add', (req, res) => {
 //     })
 // });
 
-// app.post('/create', function(request, response){
-//   console.log('POST GOT 1');
-//   console.log(request.body.name);
-//   console.log(request.body.author);
-// });
-
-app.post("/add", function (req, res) {
+app.post("/create", function (req, res) {
   console.log('POST GOT 2');
   console.log(req.body.name);
   console.log(req.body.author);
+  console.log(req.body.ingredients)
+  var body = '';
+    filePath = __dirname + '/public/data.txt';
+    req.on('data', function(data) {
+        body += data;
+    });
+
+    req.on('end', function (){
+        fs.appendFile(filePath, body, function() {
+            res.end();
+        });
+    });
   res.render('add', {
     title: 'Add Recipe',
     people: people.profiles
