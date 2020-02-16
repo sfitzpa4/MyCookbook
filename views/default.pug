@@ -10,7 +10,16 @@ html
         div.titleBlock(style=`background: top center
         no-repeat; background-size: cover;`)
         header.header
-          h1 #{title}
+          div.title
+            h1 #{title}
+          div.menu
+              .form-group
+                label.control-label.requiredField(for='menuOption')
+                  | Menu
+                .col-xs-12
+                  select#propertyType.select.form-control.input-lg(form='selectMenu', name='menuOption')
+                    option(value='0', selected= true) -- Select --
+                    option(value='1', selected= false) Home
       block content
       
       

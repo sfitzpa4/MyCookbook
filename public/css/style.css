@@ -42,13 +42,22 @@ body {
 
 .header {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 80px;
   background-color: #525286;
   color: #FFFFFF;
   margin-bottom: 50px;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 
