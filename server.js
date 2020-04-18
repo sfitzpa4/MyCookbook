@@ -2,10 +2,27 @@ const express = require('express');
 const people = require('./people.json');
 const fetch = require("node-fetch");
 const bodyParser = require("body-parser");
-
+var mysql = require('mysql');
 const app = express();
 var fs = require('fs')
 var url = require('url');
+
+
+var connection = mysql.createConnection({
+
+  host     : '127.0.0.1',
+  user     : 'root',
+  password : 'GordonTwenty4!',
+  database : 'maindb'
+
+});
+connection.connect(function(error) {
+  if (!!error) {
+    console.log(error);
+  } else {
+    console.log('Connected');
+  }
+});
 
 app.set('view engine', 'pug');
 
@@ -51,18 +68,27 @@ app.post('/login', (req,res) => {
   console.log('Login Post');
   console.log(req.body.username);
   console.log(req.body.password);
+
+  res.render('index', {
+    title: 'Homepage',
+    people: people.profiles
+  })
 });
 
 app.post("/create", function (req, res) {
   console.log('POST GOT 2');
   console.log(req.body.name);
   console.log(req.body.author);
-  console.log(req.body.ingredients)
-  var body = '';
-    filePath = __dirname + '/public/data.txt';
-    req.on('data', function(data) {
-        body += data;
-    });
+  console.log(req.body.ingredients);
+  var sql = "INSERT INTO recipes (name,author,ingredients) VALUES (?, ?, ?)"
+  var recipeName=req.body.name;
+  var authorName=req.body.author;
+  var ingredientList = req.body.ingredients;
+  connection.query(sql, [recipeName, authorName, ingredientList], function(err, result){
+      if(err) throw err;
+          console.log("1 record inserted");
+      });
+  console.log("POST");
 
     req.on('end', function (){
         fs.appendFile(filePath, body, function() {
@@ -73,6 +99,20 @@ app.post("/create", function (req, res) {
     title: 'Add Recipe',
     people: people.profiles
   })
+});
+
+
+app.post('/data', function(req, res){
+  var recipeName=req.body.name;
+  var authorName=req.body.author;
+  var ingredientList = req.body.ingredients;
+  connection.query("INSERT INTO recipes (name,author,ingredients) VALUES (?, ?, ?);", 
+  recipeName, authorName, ingredientList, function(err, result){
+      if(err) throw err;
+          console.log("1 record inserted");
+      });
+  res.send(recipeName);
+  console.log("POST");
 });
 
 const server = app.listen(7000, () => {
