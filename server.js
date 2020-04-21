@@ -2,6 +2,7 @@ const express = require('express');
 const people = require('./people.json');
 const fetch = require("node-fetch");
 const bodyParser = require("body-parser");
+const multer = require("multer");
 var mysql = require('mysql');
 const app = express();
 var fs = require('fs')
@@ -20,8 +21,41 @@ connection.connect(function(error) {
   if (!!error) {
     console.log(error);
   } else {
-    console.log('Connected');
+    console.log('Database Connected');
   }
+});
+
+var storageVar = multer.diskStorage({
+  destination: function(req, file, callback) {
+    callback(null, "./public/images")
+  },
+  filename: function(req, file, callback) {
+    callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+  }
+});
+
+var upload = multer({storage: storageVar})
+
+app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
+  console.log('Attempting to upload file');
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString('base64');
+  var finalImg = {
+    contentType: req.file.mimetype,
+    image: new Buffer.from(encode_image, 'base64')
+  };
+  // console.log(finalImg);
+  // connection.query('INSERT INTO images SET ?', finalImg, function(err, result){
+  //   console.log("Result " + result);
+  // })
+
+  // const file = req.file
+  // if (!file) {
+  //   const error = new Error('Please upload a file')
+  //   error.httpStatusCode = 400
+  //   return next(error)
+  // }
+  // res.send(file)
 });
 
 app.set('view engine', 'pug');
@@ -31,7 +65,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.json());
-
 
 app.use(express.static(__dirname + '/public'));
 
