@@ -30,7 +30,7 @@ var storageVar = multer.diskStorage({
     callback(null, "./public/images")
   },
   filename: function(req, file, callback) {
-    callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    callback(null, Date.now() + file.originalname);
   }
 });
 
@@ -39,23 +39,16 @@ var upload = multer({storage: storageVar})
 app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
   console.log('Attempting to upload file');
   var img = fs.readFileSync(req.file.path);
+  console.log(req.file.path);
   var encode_image = img.toString('base64');
-  var finalImg = {
-    contentType: req.file.mimetype,
-    image: new Buffer.from(encode_image, 'base64')
-  };
-  // console.log(finalImg);
-  // connection.query('INSERT INTO images SET ?', finalImg, function(err, result){
-  //   console.log("Result " + result);
-  // })
-
-  // const file = req.file
-  // if (!file) {
-  //   const error = new Error('Please upload a file')
-  //   error.httpStatusCode = 400
-  //   return next(error)
-  // }
-  // res.send(file)
+  var sql = "INSERT INTO images (imageData) VALUES (?)";
+  var finalImg = new Buffer.from(encode_image, 'base64');
+  console.log(finalImg.toString());
+  connection.query(sql, [req.file.path], function(err, result){
+    if(err) throw err;
+    console.log("1 record inserted");
+  });
+  console.log("POST");
 });
 
 app.set('view engine', 'pug');
@@ -97,6 +90,43 @@ app.get('/login', (req,res) => {
   })
 });
 
+app.get('/signup', (req,res) => {
+  res.render('signup', {
+    title: 'Sign Up'
+  })
+});
+
+app.post('/signup', (req,res) => {
+  console.log('Signup Post');
+  console.log(req.body.first_name);
+  console.log(req.body.last_name);
+  console.log(req.body.username);
+  console.log(req.body.password);
+
+  var first_name = req.body.first_name;
+  var last_name = req.body.last_name;
+  var username = req.body.username;
+  var password = req.body.password;
+  var image = "image1";
+  var id = 1;
+  var sql = "INSERT INTO user_profile (id,first_name,last_name,image,username,password) VALUES (?, ?, ?, ?, ?, ?)";
+
+  connection.query(sql, [id, first_name, last_name, image, username, password], function(err, result){
+    if(err) throw err;
+        console.log("1 record inserted");
+    });
+    console.log("POST user_profile");
+
+      req.on('end', function (){
+          fs.appendFile(filePath, body, function() {
+              res.end();
+          });
+      });
+  res.render('login', {
+    title: 'Log In',
+  })
+});
+
 app.post('/login', (req,res) => {
   console.log('Login Post');
   console.log(req.body.username);
@@ -113,7 +143,7 @@ app.post("/create", function (req, res) {
   console.log(req.body.name);
   console.log(req.body.author);
   console.log(req.body.ingredients);
-  var sql = "INSERT INTO recipes (name,author,ingredients) VALUES (?, ?, ?)"
+  var sql = "INSERT INTO recipes (name,author,ingredients) VALUES (?, ?, ?)";
   var recipeName=req.body.name;
   var authorName=req.body.author;
   var ingredientList = req.body.ingredients;

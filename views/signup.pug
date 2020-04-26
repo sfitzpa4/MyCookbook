@@ -1,0 +1,19 @@
+extends default
+
+block content
+    .main.container
+        .row
+        .col-md-6.col-md-offset-3
+            h1.display-4.m-b-2 Sign Up
+            body
+                form(action='/signup' method='POST')
+                    div.form-login
+                        label(for='username') First Name
+                        input.form-control(type='text' id='first_name' placeholder='first_name' name='first_name')
+                        label(for='username') Last Name
+                        input.form-control(type='text' id='last_name' placeholder='last_name' name='last_name')
+                        label(for='username') Username
+                        input.form-control(type='text' id='username' placeholder='username' name='username')
+                        label(for='password') Password
+                        input.form-control(type='password' id='password' placeholder='password' name='password')
+                        button(type='submit') Sign Up
