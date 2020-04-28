@@ -23,17 +23,24 @@ exports.signup = async function(req, res) {
     console.log(req.body.last_name);
     console.log(req.body.username);
     console.log(req.body.password);
-    var first_name = req.body.first_name;
-    var last_name = req.body.last_name;
-    var username = req.body.username;
-    var password = req.body.password;
-    var encryptedPassword = await bcrypt.hash(password, saltRounds);
-    var image = "image1";
-    var id = 1;
-    var sql = "INSERT INTO user_profile (id,first_name,last_name,image,username,password) VALUES (?, ?, ?, ?, ?, ?)";
+    var id;
+    connection.query("SELECT COUNT(id) FROM user_profile;", function(err, result){
+      id = JSON.stringify(result[0]).split(":")[1].split("}")[0];
+      console.log(id);
+    })
+    var encryptedPassword = await bcrypt.hash(req.body.password, saltRounds);
+    var user_profile = {
+      "id": parseInt(id) + 1,
+      "first_name": req.body.first_name,
+      "last_name": req.body.last_name,
+      "image": "image1",
+      "username": req.body.username,
+      "password": encryptedPassword
+    }
 
-    connection.query(sql, [id, first_name, last_name, image, username, encryptedPassword], function(err, result){
-        if(err) throw err;
+    var sql = "INSERT INTO user_profile (id,first_name,last_name,image,username,password) VALUES (?, ?, ?, ?, ?, ?)";
+    connection.query(sql, [user_profile.id, user_profile.first_name, user_profile.last_name, user_profile.image, user_profile.username, user_profile.password], function(err, result){
+      if(err) throw err;
             console.log("1 record inserted");
         });
         console.log("POST user_profile");

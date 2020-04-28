@@ -20,22 +20,6 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
-var connection = mysql.createConnection({
-
-  host     : '127.0.0.1',
-  user     : 'root',
-  password : 'GordonTwenty4!',
-  database : 'maindb'
-
-});
-connection.connect(function(error) {
-  if (!!error) {
-    console.log(error);
-  } else {
-    console.log('Database Connected');
-  }
-});
-
 var storageVar = multer.diskStorage({
   destination: function(req, file, callback) {
     callback(null, "./public/images")
