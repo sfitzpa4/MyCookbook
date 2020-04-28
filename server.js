@@ -9,6 +9,17 @@ var fs = require('fs')
 var url = require('url');
 
 
+var login = require('./routes/login');
+app.set('view engine', 'pug');
+
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(bodyParser.urlencoded({extended: false}));
+
+// Parse JSON bodies (as sent by API clients)
+app.use(bodyParser.json());
+
+app.use(express.static(__dirname + '/public'));
+
 var connection = mysql.createConnection({
 
   host     : '127.0.0.1',
@@ -51,16 +62,6 @@ app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
   console.log("POST");
 });
 
-app.set('view engine', 'pug');
-
-// Parse URL-encoded bodies (as sent by HTML forms)
-app.use(bodyParser.urlencoded({extended: false}));
-
-// Parse JSON bodies (as sent by API clients)
-app.use(bodyParser.json());
-
-app.use(express.static(__dirname + '/public'));
-
 app.get('/', (req, res) => {
     res.render('index', {
       title: 'Homepage',
@@ -96,47 +97,8 @@ app.get('/signup', (req,res) => {
   })
 });
 
-app.post('/signup', (req,res) => {
-  console.log('Signup Post');
-  console.log(req.body.first_name);
-  console.log(req.body.last_name);
-  console.log(req.body.username);
-  console.log(req.body.password);
-
-  var first_name = req.body.first_name;
-  var last_name = req.body.last_name;
-  var username = req.body.username;
-  var password = req.body.password;
-  var image = "image1";
-  var id = 1;
-  var sql = "INSERT INTO user_profile (id,first_name,last_name,image,username,password) VALUES (?, ?, ?, ?, ?, ?)";
-
-  connection.query(sql, [id, first_name, last_name, image, username, password], function(err, result){
-    if(err) throw err;
-        console.log("1 record inserted");
-    });
-    console.log("POST user_profile");
-
-      req.on('end', function (){
-          fs.appendFile(filePath, body, function() {
-              res.end();
-          });
-      });
-  res.render('login', {
-    title: 'Log In',
-  })
-});
-
-app.post('/login', (req,res) => {
-  console.log('Login Post');
-  console.log(req.body.username);
-  console.log(req.body.password);
-
-  res.render('index', {
-    title: 'Homepage',
-    people: people.profiles
-  })
-});
+app.post('/signup', login.signup);
+app.post('/login', login.login);
 
 app.post("/create", function (req, res) {
   console.log('POST GOT 2');
