@@ -62,7 +62,7 @@ app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.render('index', {
+    res.render('homepage', {
       title: 'Homepage',
       people: people.profiles
     })
