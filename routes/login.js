@@ -26,6 +26,7 @@ exports.signup = async function(req, res) {
     var id;
     connection.query("SELECT COUNT(id) FROM user_profile;", function(err, result){
       id = JSON.stringify(result[0]).split(":")[1].split("}")[0];
+      console.log(result[0]);
       console.log(id);
     })
     var encryptedPassword = await bcrypt.hash(req.body.password, saltRounds);

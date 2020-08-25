@@ -7,6 +7,21 @@ var mysql = require('mysql');
 const app = express();
 var fs = require('fs')
 var url = require('url');
+var connection = mysql.createConnection({
+
+  host     : '127.0.0.1',
+  user     : 'root',
+  password : 'GordonTwenty4!',
+  database : 'maindb'
+
+});
+connection.connect(function(error) {
+  if (!!error) {
+    console.log(error);
+  } else {
+    console.log('Database Connected');
+  }
+});
 
 
 var login = require('./routes/login');
@@ -93,6 +108,7 @@ app.post("/create", function (req, res) {
   var recipeName=req.body.name;
   var authorName=req.body.author;
   var ingredientList = req.body.ingredients;
+  console.log(`${ingredientList} ${ingredientList.length}`);
   connection.query(sql, [recipeName, authorName, ingredientList], function(err, result){
       if(err) throw err;
           console.log("1 record inserted");
