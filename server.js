@@ -62,10 +62,20 @@ app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
 });
 
 app.get('/', (req, res) => {
+  connection.query("SELECT * FROM recipes", function(err, result){
+    if(err) throw err;
+    var queryArr = [];
+    result.forEach(function(item) {
+      console.log(JSON.parse(JSON.stringify(item)));
+      queryArr.push(JSON.parse(JSON.stringify(item)));
+    });
+
     res.render('homepage', {
       title: 'Homepage',
-      people: people.profiles
+      query: queryArr[0],
+      query1: queryArr[1]
     })
+  });
 });
   
 app.get('/profile', (req, res) => {
@@ -99,27 +109,39 @@ app.get('/signup', (req,res) => {
 app.post('/signup', login.signup);
 app.post('/login', login.login);
 
-app.post("/create", function (req, res) {
-  console.log('POST GOT 2');
+app.post("/create", upload.single('myFile'), (req, res, next) => {
+  console.log(req.body);
   console.log(req.body.name);
   console.log(req.body.author);
   console.log(req.body.ingredients);
-  var sql = "INSERT INTO recipes (name,author,ingredients) VALUES (?, ?, ?)";
+  console.log(req.body.directions);
+  console.log('Attempting to upload file');
+
+  // Stage Image File
+  var img = fs.readFileSync(req.file.path);
+  var imgPath = req.file.path.split("public\\")[1].replace("\\", "/");
+  console.log(imgPath);
+  var encode_image = img.toString('base64');
+  //var img_sql = "INSERT INTO images (imageData) VALUES (?)";
+  var finalImg = new Buffer.from(encode_image, 'base64');
+
+  // Prepare SQL for Form
+  var sql = "INSERT INTO recipes (name,author,ingredients,directions,image) VALUES (?, ?, ?, ?, ?)";
   var recipeName=req.body.name;
   var authorName=req.body.author;
   var ingredientList = req.body.ingredients;
-  console.log(`${ingredientList} ${ingredientList.length}`);
-  connection.query(sql, [recipeName, authorName, ingredientList], function(err, result){
+  var directions = req.body.directions;
+
+  req.on('end', function (){
+      fs.appendFile(filePath, body, function() {
+          res.end();
+      });
+  });
+  connection.query(sql, [recipeName, authorName, ingredientList, directions, imgPath], function(err, result){
       if(err) throw err;
           console.log("1 record inserted");
       });
   console.log("POST");
-
-    req.on('end', function (){
-        fs.appendFile(filePath, body, function() {
-            res.end();
-        });
-    });
   res.render('add', {
     title: 'Add Recipe',
     people: people.profiles

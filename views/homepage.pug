@@ -10,20 +10,19 @@ block content
                 h3 The Perfect Burger
                 p Just some random text, lorem ipsum text praesent tincidunt ipsum lipsum.
             .w3-half
-                img(src='/images/pancakes.jpeg' alt='Pancakes' style='width:100%')
+                img(src='images/pancakes.jpeg' alt='Pancakes' style='width:100%')
                 h3 Let Me Tell You About These Cakes
                 p
                     | Once again, some random text to lorem lorem lorem lorem ipsum text praesent tincidunt ipsum lipsum.
         .w3-row-padding.w3-padding-16.w3-center    
             .w3-half
-                img(src='/images/burrito.jpeg' alt='Burrito' style='width:100%')
-                h3 Burritos
-                p Lorem ipsum text praesent tincidunt ipsum lipsum.
-                p What else?
+                img(src=query.image style='width:100%')
+                h3 #{query.name}
+                p #{query.author}
             .w3-half
-                img(src='/images/meatball.jpg_1587929006847.jpg' alt='There It Is' style='width:100%')
-                h3 Once Again, Placeholder
-                p Lorem ipsum text praesent tincidunt ipsum lipsum.
+                img(src=query1.image style='width:100%')
+                h3 #{query1.name}
+                p #{query1.author}
         // Second Photo Grid
         //.w3-row-padding.w3-padding-16.w3-center
             .w3-quarter
