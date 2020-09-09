@@ -84,12 +84,21 @@ exports.login = async function(req,res){
         else{
           res.send({
             "code":206,
-            "success":"username does not exits"
+            "failure":"username does not exist"
               });
         }
       }
+    });
+    connection.query("SELECT * FROM recipes", function(err, result){
+      if(err) throw err;
+      var queryArr = [];
+      result.forEach(function(item) {
+        console.log(JSON.parse(JSON.stringify(item)));
+        queryArr.push(JSON.parse(JSON.stringify(item)));
       });
-      res.render('add', {
-        title: 'Successful Login: ' + username,
+      res.render('homepage', {
+        title: 'Welcome: ' + username,
+        query: queryArr
       })
+    });
   }

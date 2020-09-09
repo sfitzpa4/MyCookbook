@@ -71,9 +71,8 @@ app.get('/', (req, res) => {
     });
 
     res.render('homepage', {
-      title: 'Homepage',
-      query: queryArr[0],
-      query1: queryArr[1]
+      title: 'Welcome',
+      query: queryArr,
     })
   });
 });
