@@ -7,24 +7,11 @@ var mysql = require('mysql');
 const app = express();
 var fs = require('fs')
 var url = require('url');
-var connection = mysql.createConnection({
 
-  host     : '127.0.0.1',
-  user     : 'root',
-  password : 'GordonTwenty4!',
-  database : 'maindb'
-
-});
-connection.connect(function(error) {
-  if (!!error) {
-    console.log(error);
-  } else {
-    console.log('Database Connected');
-  }
-});
-
-
+// Routes
+var connection = require('./routes/connection.js');
 var login = require('./routes/login');
+
 app.set('view engine', 'pug');
 
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -46,27 +33,12 @@ var storageVar = multer.diskStorage({
 
 var upload = multer({storage: storageVar})
 
-app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
-  console.log('Attempting to upload file');
-  var img = fs.readFileSync(req.file.path);
-  console.log(req.file.path);
-  var encode_image = img.toString('base64');
-  var sql = "INSERT INTO images (imageData) VALUES (?)";
-  var finalImg = new Buffer.from(encode_image, 'base64');
-  console.log(finalImg.toString());
-  connection.query(sql, [req.file.path], function(err, result){
-    if(err) throw err;
-    console.log("1 record inserted");
-  });
-  console.log("POST");
-});
-
 app.get('/', (req, res) => {
   connection.query("SELECT * FROM recipes", function(err, result){
     if(err) throw err;
     var queryArr = [];
     result.forEach(function(item) {
-      console.log(JSON.parse(JSON.stringify(item)));
+      //console.log(JSON.parse(JSON.stringify(item)));
       queryArr.push(JSON.parse(JSON.stringify(item)));
     });
 
@@ -76,20 +48,28 @@ app.get('/', (req, res) => {
     })
   });
 });
-  
-app.get('/profile', (req, res) => {
-  const person = people.profiles.find(p => p.id === req.query.id);
-  res.render('profile', {
-    title: `About ${person.firstname} ${person.lastname}`,
-    person,
+
+app.get('/recipes', (req, res) => {
+  connection.query("SELECT * FROM recipes", function(err, result){
+    if(err) throw err;
+    var queryArr = [];
+    result.forEach(function(item) {
+      //console.log(JSON.parse(JSON.stringify(item)));
+      queryArr.push(JSON.parse(JSON.stringify(item)));
+    });
+
+    res.render('recipes', {
+      title: 'Recipes',
+      query: queryArr,
+    })
   });
 });
+  
 
 app.get('/add', (req, res) => {
-  console.log('ADD PAGE');
+  //console.log('ADD PAGE');
   res.render('add', {
     title: 'Add Recipe',
-    people: people.profiles
   })
 });
 
@@ -109,17 +89,17 @@ app.post('/signup', login.signup);
 app.post('/login', login.login);
 
 app.post("/create", upload.single('myFile'), (req, res, next) => {
-  console.log(req.body);
+  /* console.log(req.body);
   console.log(req.body.name);
   console.log(req.body.author);
   console.log(req.body.ingredients);
   console.log(req.body.directions);
-  console.log('Attempting to upload file');
+  console.log('Attempting to upload file'); */
 
   // Stage Image File
   var img = fs.readFileSync(req.file.path);
   var imgPath = req.file.path.split("public\\")[1].replace("\\", "/");
-  console.log(imgPath);
+  //console.log(imgPath);
   var encode_image = img.toString('base64');
   //var img_sql = "INSERT INTO images (imageData) VALUES (?)";
   var finalImg = new Buffer.from(encode_image, 'base64');
@@ -140,13 +120,19 @@ app.post("/create", upload.single('myFile'), (req, res, next) => {
       if(err) throw err;
           console.log("1 record inserted");
       });
-  console.log("POST");
+  //console.log("POST");
   res.render('add', {
     title: 'Add Recipe',
     people: people.profiles
   })
 });
 
+const server = app.listen(7000, () => {
+  console.log(`Express running → PORT ${server.address().port}`);
+});
+
+
+// Unused
 
 app.post('/data', function(req, res){
   var recipeName=req.body.name;
@@ -161,6 +147,25 @@ app.post('/data', function(req, res){
   console.log("POST");
 });
 
-const server = app.listen(7000, () => {
-    console.log(`Express running → PORT ${server.address().port}`);
+app.get('/profile', (req, res) => {
+  const person = people.profiles.find(p => p.id === req.query.id);
+  res.render('profile', {
+    title: `About ${person.firstname} ${person.lastname}`,
+    person,
+  });
+});
+
+app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
+  console.log('Attempting to upload file');
+  var img = fs.readFileSync(req.file.path);
+  console.log(req.file.path);
+  var encode_image = img.toString('base64');
+  var sql = "INSERT INTO images (imageData) VALUES (?)";
+  var finalImg = new Buffer.from(encode_image, 'base64');
+  console.log(finalImg.toString());
+  connection.query(sql, [req.file.path], function(err, result){
+    if(err) throw err;
+    console.log("1 record inserted");
+  });
+  console.log("POST");
 });

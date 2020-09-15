@@ -1,21 +1,6 @@
-var mysql = require('mysql');
 var bcrypt = require('bcrypt');
+var connection = require('./connection.js');
 const saltRounds = 10;
-var connection = mysql.createConnection({
-
-    host     : '127.0.0.1',
-    user     : 'root',
-    password : 'GordonTwenty4!',
-    database : 'maindb'
-  
-});
-connection.connect(function(error) {
-    if (!!error) {
-      console.log(error);
-    } else {
-      console.log('Database Connected');
-    }
-});
 
 exports.signup = async function(req, res) {
     console.log('Signup Post');
@@ -57,6 +42,8 @@ exports.signup = async function(req, res) {
 }
 
 exports.login = async function(req,res){
+    console.log(req.body.username);
+    console.log(req.body.password);
     var username= req.body.username;
     var password = req.body.password;
     connection.query('SELECT * FROM user_profile WHERE username = ?',[username], async function (error, results, fields) {
