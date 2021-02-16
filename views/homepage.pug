@@ -7,20 +7,28 @@ block content
             // First Photo Grid
             .w3-row-padding.w3-padding-16.w3-center
                 .w3-half
-                    img(src=query[0].image style='width:100%')
+                    - var ref = "/recipe/" + query[0].name
+                    a(href=ref)
+                        img(src=query[0].image style='width:100%')
                     h3 #{query[0].name}
                     p #{query[0].author}
                 .w3-half
-                    img(src=query[1].image style='width:100%')
+                    - var ref = "/recipe/" + query[1].name
+                    a(href=ref)
+                        img(src=query[1].image style='width:100%')
                     h3 #{query[1].name}
                     p #{query[1].author}
             .w3-row-padding.w3-padding-16.w3-center    
                 .w3-half
-                    img(src=query[2].image style='width:100%')
+                    - var ref = "/recipe/" + query[2].name
+                    a(href=ref)
+                        img(src=query[2].image style='width:100%')
                     h3 #{query[2].name}
                     p #{query[2].author}
                 .w3-half
-                    img(src=query[3].image style='width:100%')
+                    - var ref = "/recipe/" + query[3].name
+                    a(href=ref)
+                        img(src=query[3].image style='width:100%')
                     h3 #{query[3].name}
                     p #{query[3].author}
         // Second Photo Grid

@@ -11,6 +11,7 @@ var url = require('url');
 // Routes
 var connection = require('./routes/connection.js');
 var login = require('./routes/login');
+const { query } = require('express');
 
 app.set('view engine', 'pug');
 
@@ -168,4 +169,22 @@ app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
     console.log("1 record inserted");
   });
   console.log("POST");
+});
+
+app.get('/recipe/:id', function(req, res) {
+  var recipeName = req.params.id;
+  var sql = "SELECT * FROM recipes WHERE name = ?";
+  console.log(req.params.id);
+  console.log(sql);
+  connection.query(sql, recipeName, function(err, result){
+    if(err) throw err;
+    var query = [];
+    result.forEach(function(item) {
+      query.push(JSON.parse(JSON.stringify(item)));
+    });
+    console.log(query[0].image);
+    res.render('recipePage', {
+      recipeQuery: query[0],
+    })
+  });
 });
