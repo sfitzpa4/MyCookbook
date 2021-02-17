@@ -14,6 +14,6 @@ var connection = mysql.createConnection({
     } else {
       console.log('Database Connected');
     }
-  });
+});
 
-  module.exports = connection;
+module.exports = connection;

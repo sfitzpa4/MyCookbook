@@ -1,5 +1,6 @@
 var bcrypt = require('bcrypt');
 var connection = require('./connection.js');
+var currentUser = require('../server.js');
 const saltRounds = 10;
 
 exports.signup = async function(req, res) {
@@ -41,6 +42,11 @@ exports.signup = async function(req, res) {
     })
 }
 
+exports.logout = async function(req,res){
+  currentUser = null;
+  res.redirect("/login");
+}
+
 exports.login = async function(req,res){
     console.log(req.body.username);
     console.log(req.body.password);
@@ -80,7 +86,6 @@ exports.login = async function(req,res){
       if(err) throw err;
       var queryArr = [];
       result.forEach(function(item) {
-        console.log(JSON.parse(JSON.stringify(item)));
         queryArr.push(JSON.parse(JSON.stringify(item)));
       });
       var sql = "SELECT * FROM user_profile WHERE username = ?";
@@ -90,11 +95,7 @@ exports.login = async function(req,res){
         result.forEach(function(item) {
           query.push(JSON.parse(JSON.stringify(item)));
         });
-        console.log(query[0]);
-        res.render('profile', {
-          title: 'Profile: ' + query[0].username,
-          user_profile: query[0],
-        })
+        res.redirect("/users/" + query[0].id)
       });
     });
   }

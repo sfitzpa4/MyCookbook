@@ -11,6 +11,10 @@ var url = require('url');
 // Routes
 var connection = require('./routes/connection.js');
 var login = require('./routes/login');
+
+//Current User
+var currentUser = null;
+
 const { query } = require('express');
 
 app.set('view engine', 'pug');
@@ -45,6 +49,7 @@ app.get('/', (req, res) => {
     res.render('homepage', {
       title: 'Welcome',
       query: queryArr,
+      user_profile: currentUser,
     })
   });
 });
@@ -60,6 +65,7 @@ app.get('/recipes', (req, res) => {
     res.render('recipes', {
       title: 'Recipes',
       query: queryArr,
+      user_profile: currentUser,
     })
   });
 });
@@ -81,31 +87,43 @@ app.get('/recipe/:id', function(req, res) {
     res.render('recipePage', {
       recipeQuery: query[0],
       ingredients: ingredientList,
+      user_profile: currentUser,
     })
   });
 });
 
 app.get('/users/:id', function(req, res) {
-  var userName = req.params.id;
-  var sql = "SELECT * FROM user_profile WHERE username = ?";
-  connection.query(sql, userName, function(err, result){
+  var id = req.params.id;
+  var sql = "SELECT * FROM user_profile WHERE id = ?";
+  // if (typeof req.params.id != "number")
+  //   sql = "SELECT * FROM user_profile WHERE username = ?";
+  //   connection.query(sql, id, function(err, result){
+  //     if(err) throw err;
+  //     var query = [];
+  //     result.forEach(function(item) {
+  //       query.push(JSON.parse(JSON.stringify(item)));
+  //       console.log("QUERY:" + query)
+  //     });
+  //     res.redirect("/users/" + query[0].id);
+  //   });
+  connection.query(sql, id, function(err, result){
     if(err) throw err;
     var query = [];
     result.forEach(function(item) {
       query.push(JSON.parse(JSON.stringify(item)));
     });
-    console.log(query[0]);
+    currentUser = query[0];
     res.render('profile', {
       title: 'Profile: ' + query[0].username,
-      user_profile: query[0],
+      user_profile: currentUser,
     })
   });
 });
-  
 
 app.get('/add', (req, res) => {
   res.render('add', {
     title: 'Add Recipe',
+    user_profile: currentUser,
   })
 });
 
@@ -121,6 +139,7 @@ app.get('/signup', (req,res) => {
   })
 });
 
+app.get('/logout', login.logout);
 app.post('/signup', login.signup);
 app.post('/login', login.login);
 
@@ -133,29 +152,31 @@ app.post("/create", upload.single('myFile'), (req, res, next) => {
   var finalImg = new Buffer.from(encode_image, 'base64');
 
   // Prepare SQL for Form
-  var sql = "INSERT INTO recipes (id,name,author,ingredients,directions,image) VALUES (?,?, ?, ?, ?, ?)";
+  var sql = "INSERT INTO recipes (id,name,author,ingredients,directions,image) VALUES (?, ?, ?, ?, ?, ?)";
   var recipeName=req.body.name;
-  var authorName=req.body.author;
+  var authorName="Anonymous";
+  if (currentUser)
+    authorName = currentUser.username;
   var ingredientList = req.body.ingredients;
   var directions = req.body.directions;
-  var id;
+  var id = null;
   connection.query("SELECT MAX(id) FROM recipes;", function(err, result){
     id = parseInt(JSON.stringify(result[0]).split(":")[1].split("}")[0]) + 1;
-  })
-
-  req.on('end', function (){
+    req.on('end', function (){
       fs.appendFile(filePath, body, function() {
           res.end();
       });
-  });
-  connection.query(sql, [id, recipeName, authorName, ingredientList, directions, imgPath], function(err, result){
-      if(err) throw err;
-          console.log("1 record inserted");
-      });
-  res.render('add', {
-    title: 'Add Recipe',
-    people: people.profiles
+    });
+    connection.query(sql, [id, recipeName, authorName, ingredientList, directions, imgPath], function(err, result){
+        if(err) throw err;
+            console.log("1 record inserted");
+    });
+    res.render('add', {
+      title: 'Add Recipe',
+      user_profile: currentUser,
+    })
   })
+
 });
 
 const server = app.listen(7000, () => {
