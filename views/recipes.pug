@@ -8,7 +8,7 @@ block content
                 th Author
             each recipe in query
                 tr
-                    - var recipePage = "/recipe/" + recipe.name
+                    - var recipePage = "/recipe/" + recipe.id
                     td
                         a(href=recipePage) #{recipe.name}
                     - var authorPage = "/users/" + recipe.author

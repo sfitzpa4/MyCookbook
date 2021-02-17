@@ -3,11 +3,15 @@ extends header
 block content
     .w3-main.w3-content.w3-padding(style='max-width:1200px;margin-top:100px')
             .w3-container.w3-padding-32.w3-center
-                img.image(src="../" + recipeQuery.image style='display:block;margin:auto')
-                h4
+                img.image(src="../" + recipeQuery.image style='display:block;margin:auto;width:75%')
+                h1
                     b #{recipeQuery.name}
-                h6
-                    i #{recipeQuery.ingredients}
-                p
+                table.w3-table-all(style='margin:auto;width:25%')
+                    tr
+                        th Ingredients
+                    each item in ingredients
+                        tr
+                            td #{item}
+                h3.w3-padding-32
                     | #{recipeQuery.directions}
             

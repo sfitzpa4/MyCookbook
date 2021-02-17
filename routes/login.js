@@ -9,7 +9,7 @@ exports.signup = async function(req, res) {
     console.log(req.body.username);
     console.log(req.body.password);
     var id;
-    connection.query("SELECT COUNT(id) FROM user_profile;", function(err, result){
+    connection.query("SELECT MAX(id) FROM user_profile;", function(err, result){
       id = JSON.stringify(result[0]).split(":")[1].split("}")[0];
       console.log(result[0]);
       console.log(id);
@@ -83,9 +83,18 @@ exports.login = async function(req,res){
         console.log(JSON.parse(JSON.stringify(item)));
         queryArr.push(JSON.parse(JSON.stringify(item)));
       });
-      res.render('homepage', {
-        title: 'Welcome: ' + username,
-        query: queryArr
-      })
+      var sql = "SELECT * FROM user_profile WHERE username = ?";
+      connection.query(sql, username, function(err, result){
+        if(err) throw err;
+        var query = [];
+        result.forEach(function(item) {
+          query.push(JSON.parse(JSON.stringify(item)));
+        });
+        console.log(query[0]);
+        res.render('profile', {
+          title: 'Profile: ' + query[0].username,
+          user_profile: query[0],
+        })
+      });
     });
   }

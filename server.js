@@ -39,7 +39,6 @@ app.get('/', (req, res) => {
     if(err) throw err;
     var queryArr = [];
     result.forEach(function(item) {
-      //console.log(JSON.parse(JSON.stringify(item)));
       queryArr.push(JSON.parse(JSON.stringify(item)));
     });
 
@@ -55,7 +54,6 @@ app.get('/recipes', (req, res) => {
     if(err) throw err;
     var queryArr = [];
     result.forEach(function(item) {
-      //console.log(JSON.parse(JSON.stringify(item)));
       queryArr.push(JSON.parse(JSON.stringify(item)));
     });
 
@@ -65,10 +63,47 @@ app.get('/recipes', (req, res) => {
     })
   });
 });
+
+app.get('/recipe/:id', function(req, res) {
+  var recipeName = req.params.id;
+  var sql = "SELECT * FROM recipes WHERE id = ?";
+  var ingredientList = [];
+  connection.query(sql, recipeName, function(err, result){
+    if(err) throw err;
+    var query = [];
+    result.forEach(function(item) {
+      query.push(JSON.parse(JSON.stringify(item)));
+    });
+
+    for (var i in query[0].ingredients.toString().split(",")) {
+      ingredientList.push(query[0].ingredients.toString().split(",")[i]);
+    }
+    res.render('recipePage', {
+      recipeQuery: query[0],
+      ingredients: ingredientList,
+    })
+  });
+});
+
+app.get('/users/:id', function(req, res) {
+  var userName = req.params.id;
+  var sql = "SELECT * FROM user_profile WHERE username = ?";
+  connection.query(sql, userName, function(err, result){
+    if(err) throw err;
+    var query = [];
+    result.forEach(function(item) {
+      query.push(JSON.parse(JSON.stringify(item)));
+    });
+    console.log(query[0]);
+    res.render('profile', {
+      title: 'Profile: ' + query[0].username,
+      user_profile: query[0],
+    })
+  });
+});
   
 
 app.get('/add', (req, res) => {
-  //console.log('ADD PAGE');
   res.render('add', {
     title: 'Add Recipe',
   })
@@ -90,38 +125,33 @@ app.post('/signup', login.signup);
 app.post('/login', login.login);
 
 app.post("/create", upload.single('myFile'), (req, res, next) => {
-  /* console.log(req.body);
-  console.log(req.body.name);
-  console.log(req.body.author);
-  console.log(req.body.ingredients);
-  console.log(req.body.directions);
-  console.log('Attempting to upload file'); */
 
   // Stage Image File
   var img = fs.readFileSync(req.file.path);
   var imgPath = req.file.path.split("public\\")[1].replace("\\", "/");
-  //console.log(imgPath);
   var encode_image = img.toString('base64');
-  //var img_sql = "INSERT INTO images (imageData) VALUES (?)";
   var finalImg = new Buffer.from(encode_image, 'base64');
 
   // Prepare SQL for Form
-  var sql = "INSERT INTO recipes (name,author,ingredients,directions,image) VALUES (?, ?, ?, ?, ?)";
+  var sql = "INSERT INTO recipes (id,name,author,ingredients,directions,image) VALUES (?,?, ?, ?, ?, ?)";
   var recipeName=req.body.name;
   var authorName=req.body.author;
   var ingredientList = req.body.ingredients;
   var directions = req.body.directions;
+  var id;
+  connection.query("SELECT MAX(id) FROM recipes;", function(err, result){
+    id = parseInt(JSON.stringify(result[0]).split(":")[1].split("}")[0]) + 1;
+  })
 
   req.on('end', function (){
       fs.appendFile(filePath, body, function() {
           res.end();
       });
   });
-  connection.query(sql, [recipeName, authorName, ingredientList, directions, imgPath], function(err, result){
+  connection.query(sql, [id, recipeName, authorName, ingredientList, directions, imgPath], function(err, result){
       if(err) throw err;
           console.log("1 record inserted");
       });
-  //console.log("POST");
   res.render('add', {
     title: 'Add Recipe',
     people: people.profiles
@@ -171,20 +201,3 @@ app.post("/uploadFile", upload.single('myFile'), (req, res, next) => {
   console.log("POST");
 });
 
-app.get('/recipe/:id', function(req, res) {
-  var recipeName = req.params.id;
-  var sql = "SELECT * FROM recipes WHERE name = ?";
-  console.log(req.params.id);
-  console.log(sql);
-  connection.query(sql, recipeName, function(err, result){
-    if(err) throw err;
-    var query = [];
-    result.forEach(function(item) {
-      query.push(JSON.parse(JSON.stringify(item)));
-    });
-    console.log(query[0].image);
-    res.render('recipePage', {
-      recipeQuery: query[0],
-    })
-  });
-});

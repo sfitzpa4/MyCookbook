@@ -1,17 +1,11 @@
-extends default
-
-block header
+extends header
 
 block content
-  div.profile
-    div.profile-image(style=`background: url('/images/${person.imgSrc}') top center
-    no-repeat; background-size: cover;`)
-    div.profile-details
-      h1.profile-name
-        | #{person.firstname} #{person.lastname}
-      h2.profile-tagline
-        | #{person.tagline}
-      p.profile-bio
-        | #{person.bio}
-      a.button.button-twitter(href=`${person.twitter}`)
-        | Follow me on Twitter
+  .w3-main.w3-content.w3-padding(style='max-width:1200px;margin-top:100px')
+        .w3-container.w3-padding-32.w3-center
+            h4
+                b Welcome back #{user_profile.first_name}!
+            h6
+                i Generic
+            p
+                | Details
