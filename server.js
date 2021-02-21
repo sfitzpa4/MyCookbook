@@ -93,32 +93,44 @@ app.get('/recipe/:id', function(req, res) {
 });
 
 app.get('/users/:id', function(req, res) {
-  var id = req.params.id;
-  var sql = "SELECT * FROM user_profile WHERE id = ?";
-  // if (typeof req.params.id != "number")
-  //   sql = "SELECT * FROM user_profile WHERE username = ?";
-  //   connection.query(sql, id, function(err, result){
-  //     if(err) throw err;
-  //     var query = [];
-  //     result.forEach(function(item) {
-  //       query.push(JSON.parse(JSON.stringify(item)));
-  //       console.log("QUERY:" + query)
-  //     });
-  //     res.redirect("/users/" + query[0].id);
-  //   });
-  connection.query(sql, id, function(err, result){
-    if(err) throw err;
-    var query = [];
-    result.forEach(function(item) {
-      query.push(JSON.parse(JSON.stringify(item)));
+  var id = parseInt(req.params.id);
+  var sql2 = "SELECT * FROM user_profile WHERE id = ?";
+  if (isNaN(id)) {
+    var sql = "SELECT * FROM user_profile WHERE username = ?";
+    var user_id = null;
+    connection.query(sql, req.params.id, function(err, result){
+      if(err) throw err;
+      result.forEach(function(item) {
+        var query = JSON.parse(JSON.stringify(item));
+        user_id = query.id;
+        sql2 = "SELECT * FROM user_profile WHERE id = ?";
+        connection.query(sql2, user_id, function(err, result){
+          if(err) throw err;
+          var query = [];
+          result.forEach(function(item) {
+            query.push(JSON.parse(JSON.stringify(item)));
+          });
+          currentUser = query[0];
+          res.redirect("/users/" + currentUser.id);
     });
-    currentUser = query[0];
-    res.render('profile', {
-      title: 'Profile: ' + query[0].username,
-      user_profile: currentUser,
-    })
-  });
+      });
+    });
+  } else {
+    connection.query(sql2, id, function(err, result){
+      if(err) throw err;
+      var query = [];
+      result.forEach(function(item) {
+        query.push(JSON.parse(JSON.stringify(item)));
+      });
+      currentUser = query[0];
+      res.render('profile', {
+        title: 'Profile: ' + query[0].username,
+        user_profile: currentUser,
+      })
+    });
+  }
 });
+
 
 app.get('/add', (req, res) => {
   res.render('add', {
